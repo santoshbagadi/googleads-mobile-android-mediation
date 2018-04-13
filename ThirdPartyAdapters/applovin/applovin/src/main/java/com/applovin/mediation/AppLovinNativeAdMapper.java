@@ -14,12 +14,12 @@ import com.google.android.gms.ads.mediation.NativeAppInstallAdMapper;
 
 import java.util.ArrayList;
 
-public class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
+class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
 
-    private AppLovinNativeAd nativeAd;
+    private AppLovinNativeAd mNativeAd;
 
-    public AppLovinNativeAdMapper(AppLovinNativeAd nativeAd, Context context) {
-        this.nativeAd = nativeAd;
+    AppLovinNativeAdMapper(AppLovinNativeAd nativeAd, Context context) {
+        mNativeAd = nativeAd;
         setHeadline(nativeAd.getTitle());
         setBody(nativeAd.getDescriptionText());
         setCallToAction(nativeAd.getCtaText());
@@ -31,13 +31,10 @@ public class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
         mediaView.setLayoutParams(layoutParams);
 
         ArrayList<NativeAd.Image> images = new ArrayList<>(1);
-        AppLovinNativeAdImage image;
-        AppLovinNativeAdImage icon;
-        Drawable imageDrawable =
-                Drawable.createFromPath(Uri.parse(nativeAd.getImageUrl()).getPath());
+        Drawable imageDrawable = Drawable.createFromPath(Uri.parse(nativeAd.getImageUrl()).getPath());
         Drawable iconDrawable = Drawable.createFromPath(Uri.parse(nativeAd.getIconUrl()).getPath());
-        image = new AppLovinNativeAdImage(Uri.parse(nativeAd.getImageUrl()), imageDrawable);
-        icon = new AppLovinNativeAdImage(Uri.parse(nativeAd.getIconUrl()), iconDrawable);
+        AppLovinNativeAdImage image = new AppLovinNativeAdImage(Uri.parse(nativeAd.getImageUrl()), imageDrawable);
+        AppLovinNativeAdImage icon = new AppLovinNativeAdImage(Uri.parse(nativeAd.getIconUrl()), iconDrawable);
         images.add(image);
         setImages(images);
         setIcon(icon);
@@ -58,13 +55,13 @@ public class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
     @Override
     public void recordImpression() {
         super.recordImpression();
-        nativeAd.trackImpression();
+        mNativeAd.trackImpression();
     }
 
     @Override
     public void handleClick(View view) {
         super.handleClick(view);
-        nativeAd.launchClickTarget(view.getContext());
+        mNativeAd.launchClickTarget(view.getContext());
     }
 
     /**
@@ -72,27 +69,27 @@ public class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
      */
     private class AppLovinNativeAdImage extends NativeAd.Image {
 
-        private Drawable drawable;
-        private Uri uri;
+        private Drawable mDrawable;
+        private Uri mUri;
 
-        public AppLovinNativeAdImage(Uri uri, Drawable drawable) {
-            this.drawable = drawable;
-            this.uri = uri;
+        AppLovinNativeAdImage(Uri uri, Drawable drawable) {
+            this.mDrawable = drawable;
+            this.mUri = uri;
         }
 
         @Override
         public Drawable getDrawable() {
-            return drawable;
+            return mDrawable;
         }
 
         @Override
         public Uri getUri() {
-            return uri;
+            return mUri;
         }
 
         @Override
         public double getScale() {
-            // AppLovin SDK does not support scale, return 1 by default.
+            // AppLovin SDK does not provide scale, return 1 by default.
             return 1;
         }
     }

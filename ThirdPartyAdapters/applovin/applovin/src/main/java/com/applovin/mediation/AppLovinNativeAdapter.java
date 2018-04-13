@@ -12,7 +12,7 @@ import com.google.android.gms.ads.mediation.NativeMediationAdRequest;
 
 public class AppLovinNativeAdapter
         implements MediationNativeAdapter {
-    protected static final String TAG = AppLovinNativeAdapter.class.getSimpleName();
+    static final String TAG = AppLovinNativeAdapter.class.getSimpleName();
 
     public static final String KEY_EXTRA_AD_ID = "ad_id";
     public static final String KEY_EXTRA_CAPTION_TEXT = "caption_text";
@@ -26,17 +26,12 @@ public class AppLovinNativeAdapter
         if (nativeMediationAdRequest.isContentAdRequested()
                 && !nativeMediationAdRequest.isAppInstallAdRequested()) {
             Log.w(TAG, "Failed to request native ad. App install format needs to be requested");
-            mediationNativeListener
-                    .onAdFailedToLoad(AppLovinNativeAdapter.this, AdRequest.ERROR_CODE_INVALID_REQUEST);
+            mediationNativeListener.onAdFailedToLoad(this, AdRequest.ERROR_CODE_INVALID_REQUEST);
             return;
         }
 
-        final AppLovinSdk sdk = AppLovinSdk.getInstance(context);
-        AppLovinNativeAdListener listener = new AppLovinNativeAdListener(
-                AppLovinNativeAdapter.this,
-                mediationNativeListener,
-                sdk,
-                context);
+        final AppLovinSdk sdk = AppLovinUtils.retrieveSdk(serverParameters, context);
+        AppLovinNativeAdListener listener = new AppLovinNativeAdListener(this, mediationNativeListener, sdk, context);
         sdk.getNativeAdService().loadNativeAds(1, listener);
     }
 

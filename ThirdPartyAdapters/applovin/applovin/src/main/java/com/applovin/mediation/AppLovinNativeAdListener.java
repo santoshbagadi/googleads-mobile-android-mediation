@@ -14,30 +14,31 @@ import com.google.android.gms.ads.mediation.MediationNativeListener;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class AppLovinNativeAdListener
+class AppLovinNativeAdListener
         implements AppLovinNativeAdLoadListener, AppLovinNativeAdPrecacheListener {
 
-    private AppLovinNativeAdapter adapter;
-    private MediationNativeListener nativeListener;
-    private AppLovinSdk appLovinSdk;
-    private WeakReference<Context> contextWeakReference;
+    private final AppLovinNativeAdapter mAdapter;
+    private final MediationNativeListener mNativeListener;
+    private final AppLovinSdk mAppLovinSdk;
+    private final WeakReference<Context> mContextWeakReference;
 
-    public AppLovinNativeAdListener(AppLovinNativeAdapter adapter,
-                                    MediationNativeListener nativeListener,
-                                    AppLovinSdk sdk,
-                                    Context context) {
-        this.adapter = adapter;
-        this.nativeListener = nativeListener;
-        this.appLovinSdk = sdk;
-        contextWeakReference = new WeakReference<>(context);
+    AppLovinNativeAdListener(AppLovinNativeAdapter adapter,
+                             MediationNativeListener nativeListener,
+                             AppLovinSdk sdk,
+                             Context context) {
+        mAdapter = adapter;
+        mNativeListener = nativeListener;
+        mAppLovinSdk = sdk;
+        mContextWeakReference = new WeakReference<>(context);
     }
 
     @Override
     public void onNativeAdsLoaded(List<AppLovinNativeAd> nativeAds) {
         if (nativeAds.size() > 0 && isValidNativeAd(nativeAds.get(0))) {
-            appLovinSdk.getNativeAdService()
-                    .precacheResources(nativeAds.get(0), AppLovinNativeAdListener.this);
+            mAppLovinSdk.getNativeAdService().precacheResources(nativeAds.get(0), this);
         } else {
+            Log.w(AppLovinNativeAdapter.TAG,
+                    "Ad from AppLovin doesn't have all assets required for the app install ad format");
             notifyAdFailure(AdRequest.ERROR_CODE_NO_FILL);
         }
     }
@@ -50,17 +51,17 @@ public class AppLovinNativeAdListener
     @Override
     public void onNativeAdImagesPrecached(AppLovinNativeAd ad) {
         // Create a native ad.
-        if (contextWeakReference.get() == null) {
+        Context context = mContextWeakReference.get();
+        if (context == null) {
             Log.w(AppLovinNativeAdapter.TAG, "Failed to create mapper. Context is null.");
             notifyAdFailure(AdRequest.ERROR_CODE_INTERNAL_ERROR);
             return;
         }
-        final AppLovinNativeAdMapper mapper =
-                new AppLovinNativeAdMapper(ad, contextWeakReference.get());
+        final AppLovinNativeAdMapper mapper = new AppLovinNativeAdMapper(ad, context);
         AppLovinSdkUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                nativeListener.onAdLoaded(adapter, mapper);
+                mNativeListener.onAdLoaded(mAdapter, mapper);
             }
         });
     }
@@ -81,21 +82,22 @@ public class AppLovinNativeAdListener
     }
 
     /**
-     * Sends a failure callback to {@link #nativeListener}.
+     * Sends a failure callback to {@link #mNativeListener}.
+     *
      * @param errorCode AdMob {@link AdRequest} error code.
      */
     private void notifyAdFailure(final int errorCode) {
         AppLovinSdkUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                nativeListener.onAdFailedToLoad(adapter, errorCode);
+                mNativeListener.onAdFailedToLoad(mAdapter, errorCode);
             }
         });
-
     }
 
     /**
      * Checks whether or not the {@link AppLovinNativeAd} has all the required assets.
+     *
      * @param nativeAd AppLovin native ad.
      * @return {@code true} if the native ad has all the required assets.
      */
