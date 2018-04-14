@@ -14,12 +14,14 @@ import com.google.android.gms.ads.mediation.MediationNativeListener;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import static com.applovin.mediation.AppLovinNativeAdapter.TAG;
+
 class AppLovinNativeAdListener
         implements AppLovinNativeAdLoadListener, AppLovinNativeAdPrecacheListener {
 
     private final AppLovinNativeAdapter mAdapter;
     private final MediationNativeListener mNativeListener;
-    private final AppLovinSdk mAppLovinSdk;
+    private final AppLovinSdk mSdk;
     private final WeakReference<Context> mContextWeakReference;
 
     AppLovinNativeAdListener(AppLovinNativeAdapter adapter,
@@ -28,16 +30,16 @@ class AppLovinNativeAdListener
                              Context context) {
         mAdapter = adapter;
         mNativeListener = nativeListener;
-        mAppLovinSdk = sdk;
+        mSdk = sdk;
         mContextWeakReference = new WeakReference<>(context);
     }
 
     @Override
     public void onNativeAdsLoaded(List<AppLovinNativeAd> nativeAds) {
         if (nativeAds.size() > 0 && isValidNativeAd(nativeAds.get(0))) {
-            mAppLovinSdk.getNativeAdService().precacheResources(nativeAds.get(0), this);
+            mSdk.getNativeAdService().precacheResources(nativeAds.get(0), this);
         } else {
-            Log.w(AppLovinNativeAdapter.TAG,
+            Log.e(TAG,
                     "Ad from AppLovin doesn't have all assets required for the app install ad format");
             notifyAdFailure(AdRequest.ERROR_CODE_NO_FILL);
         }
@@ -45,6 +47,7 @@ class AppLovinNativeAdListener
 
     @Override
     public void onNativeAdsFailedToLoad(final int errorCode) {
+        Log.e(TAG, "Native ad failed to load " + errorCode);
         notifyAdFailure(AppLovinUtils.toAdMobErrorCode(errorCode));
     }
 
@@ -53,11 +56,12 @@ class AppLovinNativeAdListener
         // Create a native ad.
         Context context = mContextWeakReference.get();
         if (context == null) {
-            Log.w(AppLovinNativeAdapter.TAG, "Failed to create mapper. Context is null.");
+            Log.e(TAG, "Failed to create mapper. Context is null.");
             notifyAdFailure(AdRequest.ERROR_CODE_INTERNAL_ERROR);
             return;
         }
         final AppLovinNativeAdMapper mapper = new AppLovinNativeAdMapper(ad, context);
+        Log.d(TAG, "Native ad loaded.");
         AppLovinSdkUtils.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -73,12 +77,13 @@ class AppLovinNativeAdListener
 
     @Override
     public void onNativeAdImagePrecachingFailed(AppLovinNativeAd ad, final int errorCode) {
+        Log.e(TAG, "Native ad failed to pre cache images " + errorCode);
         notifyAdFailure(AppLovinUtils.toAdMobErrorCode(errorCode));
     }
 
     @Override
     public void onNativeAdVideoPrecachingFailed(AppLovinNativeAd ad, final int errorCode) {
-        notifyAdFailure(AppLovinUtils.toAdMobErrorCode(errorCode));
+        // Do nothing.
     }
 
     /**

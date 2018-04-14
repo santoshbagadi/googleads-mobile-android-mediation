@@ -67,14 +67,14 @@ class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
     /**
      * A {@link NativeAd.Image} class used to map AppLovin native image to AdMob native image.
      */
-    private class AppLovinNativeAdImage extends NativeAd.Image {
+    private static class AppLovinNativeAdImage extends NativeAd.Image {
 
-        private Drawable mDrawable;
-        private Uri mUri;
+        private final Drawable mDrawable;
+        private final Uri mUri;
 
         AppLovinNativeAdImage(Uri uri, Drawable drawable) {
-            this.mDrawable = drawable;
-            this.mUri = uri;
+            mDrawable = drawable;
+            mUri = uri;
         }
 
         @Override

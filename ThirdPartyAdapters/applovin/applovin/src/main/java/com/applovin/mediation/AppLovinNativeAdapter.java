@@ -25,7 +25,7 @@ public class AppLovinNativeAdapter
                                 final Bundle mediationExtras) {
         if (nativeMediationAdRequest.isContentAdRequested()
                 && !nativeMediationAdRequest.isAppInstallAdRequested()) {
-            Log.w(TAG, "Failed to request native ad. App install format needs to be requested");
+            Log.e(TAG, "Failed to request native ad. App install format needs to be requested");
             mediationNativeListener.onAdFailedToLoad(this, AdRequest.ERROR_CODE_INVALID_REQUEST);
             return;
         }
