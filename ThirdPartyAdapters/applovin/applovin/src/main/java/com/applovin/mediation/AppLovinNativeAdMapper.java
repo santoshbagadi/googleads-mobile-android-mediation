@@ -31,10 +31,15 @@ class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
         mediaView.setLayoutParams(layoutParams);
 
         ArrayList<NativeAd.Image> images = new ArrayList<>(1);
-        Drawable imageDrawable = Drawable.createFromPath(Uri.parse(nativeAd.getImageUrl()).getPath());
-        Drawable iconDrawable = Drawable.createFromPath(Uri.parse(nativeAd.getIconUrl()).getPath());
-        AppLovinNativeAdImage image = new AppLovinNativeAdImage(Uri.parse(nativeAd.getImageUrl()), imageDrawable);
-        AppLovinNativeAdImage icon = new AppLovinNativeAdImage(Uri.parse(nativeAd.getIconUrl()), iconDrawable);
+        Uri imageUri = Uri.parse(nativeAd.getImageUrl());
+        Drawable imageDrawable = Drawable.createFromPath(imageUri.getPath());
+
+        Uri iconUri = Uri.parse(nativeAd.getIconUrl());
+        Drawable iconDrawable = Drawable.createFromPath(iconUri.getPath());
+
+        AppLovinNativeAdImage image = new AppLovinNativeAdImage(imageUri, imageDrawable);
+        AppLovinNativeAdImage icon = new AppLovinNativeAdImage(iconUri, iconDrawable);
+
         images.add(image);
         setImages(images);
         setIcon(icon);
