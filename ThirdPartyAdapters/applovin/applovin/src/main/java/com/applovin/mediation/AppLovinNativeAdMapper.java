@@ -52,6 +52,7 @@ class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
         extraAssets.putLong(AppLovinNativeAdapter.KEY_EXTRA_AD_ID, nativeAd.getAdId());
         extraAssets.putString(
                 AppLovinNativeAdapter.KEY_EXTRA_CAPTION_TEXT, nativeAd.getCaptionText());
+        setExtras(extraAssets);
 
         setOverrideClickHandling(false);
         setOverrideImpressionRecording(false);
