@@ -107,8 +107,7 @@ class AppLovinNativeAdListener
      * @return {@code true} if the native ad has all the required assets.
      */
     private static boolean isValidNativeAd(AppLovinNativeAd nativeAd) {
-        return nativeAd.isImagePrecached() && nativeAd.getImageUrl() != null
-                && nativeAd.getIconUrl() != null && nativeAd.getTitle() != null
+        return nativeAd.getImageUrl() != null && nativeAd.getIconUrl() != null && nativeAd.getTitle() != null
                 && nativeAd.getDescriptionText() != null && nativeAd.getCtaText() != null;
     }
 }

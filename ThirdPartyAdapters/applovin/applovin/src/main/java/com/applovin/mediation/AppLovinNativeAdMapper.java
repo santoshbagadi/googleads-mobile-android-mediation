@@ -60,13 +60,11 @@ class AppLovinNativeAdMapper extends NativeAppInstallAdMapper {
 
     @Override
     public void recordImpression() {
-        super.recordImpression();
         mNativeAd.trackImpression();
     }
 
     @Override
     public void handleClick(View view) {
-        super.handleClick(view);
         mNativeAd.launchClickTarget(view.getContext());
     }
 
